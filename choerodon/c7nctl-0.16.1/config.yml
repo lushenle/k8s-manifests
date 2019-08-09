@@ -1,0 +1,38 @@
+version: 0.18
+metadata:
+  name: install-choerodon
+  namespace: c7n-system
+spec:
+  persistence:
+    storageClassName: nfs-provisioner
+  resources:
+    mysql:
+      external: false
+    gitlab:
+      domain: gitlab.ccav.tech
+      external: false
+      username: root
+      schema: http
+    minio:
+      domain: minio.ccav.tech
+      schema: http
+    chartmuseum:
+      domain: chart.ccav.tech
+      schema: http
+    api-gateway:
+      domain: api.ccav.tech
+      schema: http
+    notify-service:
+      domain: notify.ccav.tech
+      schema: ws
+    devops-service:
+      domain: devops.ccav.tech
+      schema: ws
+    choerodon-front:
+      domain: c7n.ccav.tech
+      schema: http
+      username: admin
+      password: admin
+    xwiki:
+      domain: wiki.ccav.tech
+      schema: http

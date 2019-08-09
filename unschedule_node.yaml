@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Node
+metadata:
+  name: 172.20.35.41
+  labels:
+    kubernetes.io/hostname: 172.20.35.41
+spec:
+  unschedulable: true
