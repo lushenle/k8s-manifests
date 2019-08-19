@@ -1,0 +1,13 @@
+kind: Role
+metadata:
+  name: pods-reader
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/status
+  verbs:
+  - get
+  - list
+  - watch
