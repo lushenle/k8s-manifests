@@ -1,0 +1,17 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: kubernetes-dashboard-route
+  namespace: kube-system
+spec:
+  entryPoints:
+  - websecure
+  tls:
+    secretName: kubernetes-dashboard-certs
+  routes:
+  - match: Host(`dashboard.idocker.io`)
+    kind: Rule
+    services:
+      - name: kubernetes-dashboard
+        port: 443
