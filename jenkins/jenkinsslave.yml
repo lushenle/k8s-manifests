@@ -1,0 +1,89 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: jenkinsagent
+  name: jenkinsagent
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: jenkinsagent
+  template:
+    metadata:
+      labels:
+        app: jenkinsagent
+      name: jenkinsagent
+    spec:
+      containers:
+        - name: jenkinsagent
+          image: registry.moqi.com.cn/jenkins/jnlp-slave:4.3-1
+          securityContext:
+            privileged: true
+          imagePullPolicy: IfNotPresent
+          resources:
+            limits:
+              cpu: 2000m
+              memory: 2Gi
+            requests:
+              cpu: 1000m
+              memory: 1Gi
+          volumeMounts:
+#            - name: jenkinsagent-workdir
+#              mountPath: /home/jenkins/workspace
+#            - name: buildtools
+#              mountPath: /home/jenkins/buildtools
+            - name: cephfs-jenkins-agent
+              mountPath: /home/jenkins
+            - name: dockersock
+              mountPath: "/var/run/docker.sock"
+            - name: dockercmd
+              mountPath: /usr/bin/docker
+            - name: kubectlconfig
+              mountPath: /home/jenkins/.kube/config
+            - name: kubectlcmd
+              mountPath: /usr/bin/kubectl
+          env:
+            - name: JENKINS_URL
+              value: http://jenkins:30080
+            - name: JENKINS_SECRET
+              value: 
+            - name: JENKINS_AGENT_NAME
+              value: build01
+            - name: JENKINS_AGENT_WORKDIR
+              value: /home/jenkins/shenlel/jenkins/worksapce
+            - name: JENKINS_AGENT_BUILD_TOOLS
+              value: /home/jenkins/shenlel/jenkins/buildtools
+      volumes:
+#        - name: jenkinsagent-workdir
+#          hostPath:
+#            path: /data/devops/jenkins/workspace
+#            type: Directory
+#        - name: buildtools
+#          hostPath:
+#            path: /usr/local/buildtools
+#            type: Directory
+        - name: kubectlconfig
+          hostPath:
+            path: /home/shenlel/.kube/config
+        - name: kubectlcmd
+          hostPath:
+            path: /opt/kube/bin/kubectl
+        - name: dockersock
+          hostPath:
+            path: /var/run/docker.sock
+        - name: dockercmd
+          hostPath:
+            path: /opt/kube/bin/docker
+        - name: cephfs-jenkins-agent
+          cephfs:
+            monitors:
+            - 10.1.1.32:6789
+            - 10.1.1.33:6789
+            - 10.1.1.34:6789
+            user: admin
+            secretRef:
+              name: cephfs-secret
+            readOnly: false
