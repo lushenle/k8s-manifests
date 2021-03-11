@@ -1,0 +1,51 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: go-web
+spec:
+  selector:
+    matchLabels:
+      app: go-web
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: go-web
+    spec:
+      containers:
+      - name: go-web
+        image: docker.io/manunkind/hellogo:v4.0
+        imagePullPolicy: IfNotPresent
+        ports:
+          - containerPort: 3000
+            name: http
+            protocol: TCP
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-web
+spec:
+  ports:
+    - name: web
+      port: 80
+      targetPort: http
+  selector:
+    app: go-web
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: go-web-ingr
+spec:
+  entryPoints:
+  - web
+  routes:
+  - match: Host(`go-web.k8s.idocker.io`)
+    kind: Rule
+    services:
+      - name: go-web
+        port: 80
