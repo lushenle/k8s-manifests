@@ -8,7 +8,7 @@ spec:
   entryPoints:
   - web
   routes:
-  - match: Host(`traefik.idocker.io`)
+  - match: Host(`traefik.k8s.idocker.io`)
     kind: Rule
     services:
       - name: traefik-svc
