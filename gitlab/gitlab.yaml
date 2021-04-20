@@ -119,6 +119,7 @@ spec:
     - name: http
       port: 80
       targetPort: http
+      nodePort: 30080
     - name: ssh
       port: 22
       targetPort: ssh
@@ -136,7 +137,7 @@ spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`gitlab.k8s.idocker.io`)
+    - match: Host(`git.k8s.idocker.io`)
       kind: Rule
       services:
         - name: gitlab
