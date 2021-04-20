@@ -1,0 +1,85 @@
+#---
+#apiVersion: v1
+#kind: PersistentVolumeClaim
+#metadata:
+#  name: project-data
+#spec:
+#  accessModes:
+#    - ReadWriteOnce
+#  volumeMode: Filesystem
+#  resources:
+#    requests:
+#      storage: 10Gi
+#  storageClassName: ceph-rbd-retain
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: goland
+  labels:
+    app: projector-goland
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: projector-goland
+  template:
+    metadata:
+      labels:
+        app: projector-goland
+    spec:
+      containers:
+        - name: projector-goland
+          image: registry.jetbrains.team/p/prj/containers/projector-goland
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - mountPath: /etc/localtime
+              name: localtime
+            - mountPath: /home/projector-user
+              name: project-data
+          env:
+            - name: GOROOT
+              value: /home/projector-user/sdk/go
+            - name: GOPATH
+              value: /home/projector-user/go
+            - name: GOBIN
+              value: /home/projector-user/go/bin
+      volumes:
+        - name: localtime
+          hostPath:
+            path: /etc/localtime
+        - name: project-data
+          persistentVolumeClaim:
+            claimName: project-data
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: projector-goland
+  labels:
+    app: projector-goland
+spec:
+  selector:
+    app: projector-goland
+  ports:
+    - protocol: TCP
+      name: http
+      port: 80
+      targetPort: 8887
+
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: goland-ingr
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`goland.ops.internal.moqi.ai`)
+      kind: Rule
+      services:
+        - name: projector-goland
+          port: 80
