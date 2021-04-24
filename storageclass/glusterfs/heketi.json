@@ -1,0 +1,23 @@
+{
+  "port": "18080",
+  "use_auth": true,
+  "jwt": {
+    "admin": {
+      "key": "GDxhRZstLU7-Or7U"
+    },
+    "user": {
+      "key": "xYQN3Rt37AsOFkuG"
+    }
+  },
+  "glusterfs": {
+    "executor": "ssh",
+    "sshexec": {
+      "keyfile": "/etc/heketi/heketi_key",
+      "user": "root",
+      "port": "22",
+      "fstab": "/etc/fstab"
+    },
+    "db": "/var/lib/heketi/heketi.db",
+    "loglevel" : "warning"
+  }
+}
