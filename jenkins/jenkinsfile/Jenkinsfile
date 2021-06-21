@@ -1,0 +1,89 @@
+pipeline {
+    agent { node { label "master"                    // 指定运行节点的标签或名称
+                    customWorkspace "${workspace}"   // 指定运行工作目录，可选
+        }
+    }
+
+    options {
+        timestamps()                                 // 日志会有时间戳
+        skipDefaultCheckout()                        // 删除隐式 checkout scm 语句
+        disableConcurrentBuilds()                    // 禁止并行
+        timeout(time: 1, unit: 'HOURS')              // 流水线超时时间设置，1小时
+    }
+
+    stages {
+        // 下载代码
+        stage("GetCode"){ // 阶段名称
+            steps{  // 步骤
+                echo "====++++executing GetCode++++===="
+                timeout(time:5, unit:"MINUTES"){     // 步骤超时时间
+                    script{
+                        println('获取代码')
+                    }
+                }
+            }
+        }
+        // 构建
+        stage("Build"){
+            steps{
+                echo "====++++executing Build++++===="
+                timeout(time:20, unit:"MINUTES"){    // 步骤超时时间
+                    script{
+                        println('应用打包')
+                    }
+                }
+            }
+        }
+        // 代码扫描
+        stage("CodeScan"){
+            steps{
+                echo "====++++executing CodeScan++++===="
+                timeout(time:30, unit:"MINUTES"){    // 步骤超时时间
+                    script{
+                        println('代码扫描')
+                    }
+                }
+            }
+        }
+        stage("Deploy"){
+            when {
+                expression {
+                    currentBuild.result == null || currentBuild.result == 'SUCCESS'
+                }
+            }
+            steps{
+                echo "====++++executing Deploy++++===="
+                timeout(time:10, unit:"MINUTES"){    // 步骤超时时间
+                    script{
+                        println('代码部署')
+                    }
+                }
+            }
+        }
+    }
+    post{
+        always{
+            echo "====++++always++++===="
+            script{
+                println("always")
+            }
+        }
+        success{
+            echo "====++++only when successful++++===="
+            script{
+                currentBuild.description = "\n 构建成功"
+            }
+        }
+        failure{
+            echo "====++++only when failed++++===="
+            script{
+                currentBuild.description = "\n 构建失败"
+            }
+        }
+        aborted{
+            script{
+                currentBuild.description = "\n 构建取消"
+            }
+        }
+    }
+}
