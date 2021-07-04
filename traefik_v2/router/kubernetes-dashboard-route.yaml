@@ -10,7 +10,7 @@ spec:
   tls:
     secretName: kubernetes-dashboard-certs
   routes:
-  - match: Host(`dashboard.idocker.io`)
+  - match: Host(`dashboard.k8s.idocker.io`)
     kind: Rule
     services:
       - name: kubernetes-dashboard
